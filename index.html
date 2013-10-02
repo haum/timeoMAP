@@ -23,6 +23,10 @@
 
 </head>
 <body>
+	<div id="form">
+		<select id="ligne" name="ligne">
+		</select>
+	</div>
 	<div id="map"></div>
 
 	<script type="text/javascript">
@@ -34,10 +38,15 @@
 		attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 		}).addTo(map);
 
+
+		var base_url = "http://timeoapi.haum.org/v1";
+
 		function addToMap(stations) {
 			for (n in stations) {
 				var s = stations[n];
-				stations[n]['marker'] = L.marker(s['coords']).addTo(map).bindPopup('<h4>'+s['name']+'</h4>');
+				if (s['coords'].length != 0) {
+					stations[n]['marker'] = L.marker(s['coords']).addTo(map).bindPopup('<h4>'+s['name']+'</h4>');
+				}
 			}
 		}
 
@@ -46,26 +55,45 @@
 			$.getJSON(base_url+"/lines/"+ligne+"/stops?callback=?", null, function(a){
 				stops = a.stops
 				for (code in stops) {
-				    var next_stop = stops[code][0];
-					stations[code].marker.unbindPopup();
-					stations[code].marker
-						.bindPopup('<h4>'+stations[code].name+'</h4><p>Prochain passage :'+next_stop+'</p>')
-						.openPopup().closePopup();
+					if (stations[code].marker) {
+						var next_stop = stops[code][0];
+						stations[code].marker.unbindPopup();
+						stations[code].marker
+							.bindPopup('<h4>'+stations[code].name+'</h4><p>Prochain passage :'+next_stop+'</p>')
+							.openPopup().closePopup();
+					}
 				}
 
 				setTimeout(function() { updateAll(stations, ligne)}, 150000); // attente : 2'30"
 			});
 		}
 
-		// get data from API
-		var stations;
-		var base_url = "http://timeoapi.haum.org/v1";
-		var ligne="9_R";
-		var url =  base_url+"/lines/"+ligne;
-		$.getJSON(url + "?callback=?", null, function(a) {
-			stations = a['stations'];
-			addToMap(stations);
-			updateAll(stations, ligne);
+		function getLine(ligne) {
+			var stations;
+			var url =  base_url+"/lines/"+ligne;
+			$.getJSON(url + "?callback=?", null, function(a) {
+				stations = a['stations'];
+				addToMap(stations);
+				updateAll(stations, ligne);
+				return;
+			});
+		}
+
+		var state = "";
+		$(document).ready(function(){
+			// get list of lines
+			$.getJSON(base_url+"/lines"+"?callback=?", null, function(a) {
+				lines = a['lines'];
+				for (name in lines) {
+				$('#form select').html(function (idx, oldhtml) {
+					return oldhtml+'<option value="'+lines[name]+'">'+name+'</option>';
+				});
+				}
+			});
+
+			$('#ligne').change(function (){
+				getLine($(this).val());
+			});
 		});
 
 
