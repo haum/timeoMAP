@@ -41,30 +41,31 @@
 			}
 		}
 
-		function updateAll(stations) {
+		function updateAll(stations, ligne) {
 
-			for (n in stations) {
-				$.getJSON(base_url+"/stations/"+n+"/"+ligne+"?callback=?", null, function(a){
-					var code = parseInt(a.station);
-					if (a.stops[0] == "maintenant") { markToShow = stations[code].marker}
+			$.getJSON(base_url+"/lines/"+ligne+"/stops?callback=?", null, function(a){
+				stops = a.stops
+				for (code in stops) {
+				    var next_stop = stops[code][0];
 					stations[code].marker.unbindPopup();
 					stations[code].marker
-						.bindPopup('<h4>'+stations[code].name+'</h4><p>Prochain passage :'+a.stops[0]+'</p>')
+						.bindPopup('<h4>'+stations[code].name+'</h4><p>Prochain passage :'+next_stop+'</p>')
 						.openPopup().closePopup();
-				});
-			}
+				}
+
+				setTimeout(updateAll(stations, ligne), 60000);
+			});
 		}
 
 		// get data from API
 		var stations;
-		var markToShow;
 		var base_url = "http://timeoapi.haum.org/v1";
 		var ligne="9_R";
 		var url =  base_url+"/lines/"+ligne;
 		$.getJSON(url + "?callback=?", null, function(a) {
 			stations = a['stations'];
 			addToMap(stations);
-			updateAll(stations);
+			updateAll(stations, ligne);
 		});
 
 		// }, 60000);
