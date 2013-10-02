@@ -58,7 +58,7 @@
 		// get data from API
 		var stations;
 		var markToShow;
-		var base_url = "http://127.0.0.1:8080/v1";
+		var base_url = "http://timeoapi.haum.org/v1";
 		var ligne="9_R";
 		var url =  base_url+"/lines/"+ligne;
 		$.getJSON(url + "?callback=?", null, function(a) {
