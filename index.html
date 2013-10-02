@@ -53,7 +53,7 @@
 						.openPopup().closePopup();
 				}
 
-				setTimeout(updateAll(stations, ligne), 150000); // attente : 2'30"
+				setTimeout(function() { updateAll(stations, ligne)}, 150000); // attente : 2'30"
 			});
 		}
 
