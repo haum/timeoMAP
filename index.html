@@ -57,12 +57,13 @@
 				for (code in stops) {
 					if (stations[code].marker) {
 						var next_stop = stops[code][0];
-						var intMin = next_stop.substring(0, 2) //uniquement les chiffres de next_stop
+						var opacity;
+						(next_stop.substring(0, 2) <= 3) ? opacity = 1 : opacity = 0.5;
 						stations[code].marker.unbindPopup();
 						stations[code].marker
 							.bindPopup('<h4>'+stations[code].name+'</h4><p>Prochain passage :'+next_stop+'</p>')
 							.openPopup().closePopup();
-						stations[code]['marker'].setOpacity(1/(intMin/3)); //mise en évidence de certains arrêts
+						stations[code]['marker'].setOpacity(opacity); //mise en évidence de certains arrêts
 					}
 				}
 
